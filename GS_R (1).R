@@ -4,6 +4,8 @@ library(afex)
 library(data.table)
 library(rcompanion)
 
+# testing
+
 # DATA FORMATTING (turning variables into factors for further analysis) #
 GS_Data$condition <- as.factor(GS_Data$condition)
 GS_Data$`Same location` <- as.factor(GS_Data$`Same location`)
@@ -15,7 +17,7 @@ GS_Data$Placement <- as.factor(GS_Data$Placement)
 
 
 # PLACEMENT OF TOY AT ANY LOCATION #
-# (We exclude trials in which participants don't place the toy anywhere, so this analysis has to come before trial exclusion) # 
+# (We exclude trials in which participants don't place the toy anywhere, so this analysis has to come before trial exclusion) #
 # First, construct the glmm with the full random effects structure #
 placementmodel <- mixed(Placement ~ condition + (1+condition|id) + (1+condition|trial_num), data = GS_Data, family = "binomial", control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5)), method = 'LRT', check_contrasts=FALSE)
 # It tells us that there is singularity in the model, and Singmann & Kellen (2019) suggest iteratively removing the most complex terms until we arrive at a model that doesn't face this problem #
@@ -74,7 +76,7 @@ GS_Data$`Same location` <- GS_Data$`Same location` - 1
 
 # We need to calculate each participant's 'same location' rate per condition #
 # First, form a dataset that is just the experimental condition #
-ExpCond <- GS_Data[which(GS_Data$condition=='exp'), ] 
+ExpCond <- GS_Data[which(GS_Data$condition=='exp'), ]
 # Then we form a new dataset that is just participant id and each participant's 'same location' rate #
 ExpCondAverage <- data.table(id=ExpCond$id, same_location = ExpCond$`Same location`)
 ExpCondAverage <- ExpCondAverage[, (same_location.Sum=mean(same_location)), by = id]
@@ -96,4 +98,3 @@ median(ExpCondAverage$same_location)
 median(CtrlCondAverage$same_location)
 wilcoxonOneSampleR(ExpCondAverage$same_location, mu = 0.33, alternative = "greater")
 wilcoxonOneSampleR(CtrlCondAverage$same_location, mu = 0.33, alternative = "greater")
-
